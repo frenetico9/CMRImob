@@ -1,12 +1,11 @@
+
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Routes, Route, Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
     format,
-    startOfWeek,
     getDay,
     addDays,
     addWeeks,
-    subWeeks,
     endOfWeek,
     eachDayOfInterval,
     isToday,
@@ -642,10 +641,10 @@ const DashboardPage = () => {
         ];
         
         const today = new Date();
-        const startOfWeekDay = startOfWeek(today, { weekStartsOn: 1 });
+        const startOfTodayWeek = _startOfWeek(today, { weekStartsOn: 1 });
         const weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
         const visitsTrendData = weekDays.map((day, index) => {
-            const date = addDays(startOfWeekDay, index);
+            const date = addDays(startOfTodayWeek, index);
             const visits = mockVisits.filter(v => getDay(v.start) === getDay(date)).length;
             return { day, visits };
         });
@@ -684,12 +683,23 @@ const DashboardPage = () => {
     );
 };
 
+const _startOfWeek = (date: Date, options?: { weekStartsOn?: number; locale?: object }): Date => {
+    const d = new Date(date);
+    // locale is ignored but included in signature to match usage
+    const weekStartsOn = options?.weekStartsOn ?? 0;
+    const day = d.getDay();
+    const diff = (day - weekStartsOn + 7) % 7;
+    d.setDate(d.getDate() - diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+};
+
 const AgendaPage = () => {
     const [selectedEvent, setSelectedEvent] = useState<Visit | undefined>(undefined);
     const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false);
     const [currentDate, setCurrentDate] = useState(new Date());
 
-    const weekStart = useMemo(() => startOfWeek(currentDate, { locale: ptBR, weekStartsOn: 1 }), [currentDate]);
+    const weekStart = useMemo(() => _startOfWeek(currentDate, { locale: ptBR, weekStartsOn: 1 }), [currentDate]);
     const weekEnd = useMemo(() => endOfWeek(currentDate, { locale: ptBR, weekStartsOn: 1 }), [currentDate]);
     const days = useMemo(() => eachDayOfInterval({ start: weekStart, end: weekEnd }), [weekStart, weekEnd]);
 
@@ -705,7 +715,7 @@ const AgendaPage = () => {
     }, [days]);
 
     const goToNextWeek = () => setCurrentDate(addWeeks(currentDate, 1));
-    const goToPrevWeek = () => setCurrentDate(subWeeks(currentDate, 1));
+    const goToPrevWeek = () => setCurrentDate(addWeeks(currentDate, -1));
     const goToToday = () => setCurrentDate(new Date());
 
     const handleCloseModal = () => setSelectedEvent(undefined);

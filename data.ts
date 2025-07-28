@@ -1,5 +1,28 @@
+
 import { Agent, Property, Lead, LeadStatus, PropertyStatus, PropertyType, Interaction, Visit } from './types';
-import { addDays, setHours, setMinutes, startOfWeek } from 'date-fns';
+import { addDays } from 'date-fns';
+
+const _startOfWeek = (date: Date, options?: { weekStartsOn?: number }): Date => {
+    const d = new Date(date);
+    const weekStartsOn = options?.weekStartsOn ?? 0;
+    const day = d.getDay();
+    const diff = (day - weekStartsOn + 7) % 7;
+    d.setDate(d.getDate() - diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+};
+
+const _setHours = (date: Date | number, value: number): Date => {
+  const d = new Date(date);
+  d.setHours(value);
+  return d;
+};
+
+const _setMinutes = (date: Date | number, value: number): Date => {
+  const d = new Date(date);
+  d.setMinutes(value);
+  return d;
+};
 
 export const agents: Agent[] = [
   { id: 'agent-1', name: 'Carlos Ferreira', avatarUrl: 'https://i.pravatar.cc/150?u=agent-1' },
@@ -179,14 +202,14 @@ export const interactions: Interaction[] = [
 ];
 
 const today = new Date();
-const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+const weekStart = _startOfWeek(today, { weekStartsOn: 1 });
 
 export const visits: Visit[] = [
     {
         id: 'visit-1',
         title: 'Visita com Mariana Costa',
-        start: setMinutes(setHours(addDays(weekStart, 1), 10), 0), // Terça às 10:00
-        end: setMinutes(setHours(addDays(weekStart, 1), 11), 0),
+        start: _setMinutes(_setHours(addDays(weekStart, 1), 10), 0), // Terça às 10:00
+        end: _setMinutes(_setHours(addDays(weekStart, 1), 11), 0),
         agentId: 'agent-1',
         leadId: 'lead-1',
         propertyId: 'prop-1'
@@ -194,8 +217,8 @@ export const visits: Visit[] = [
     {
         id: 'visit-2',
         title: 'Reunião com João Pedro',
-        start: setMinutes(setHours(addDays(weekStart, 2), 14), 30), // Quarta às 14:30
-        end: setMinutes(setHours(addDays(weekStart, 2), 15), 30),
+        start: _setMinutes(_setHours(addDays(weekStart, 2), 14), 30), // Quarta às 14:30
+        end: _setMinutes(_setHours(addDays(weekStart, 2), 15), 30),
         agentId: 'agent-2',
         leadId: 'lead-2',
         propertyId: 'prop-2'
@@ -203,8 +226,8 @@ export const visits: Visit[] = [
     {
         id: 'visit-3',
         title: 'Visita com Beatriz Martins',
-        start: setMinutes(setHours(addDays(weekStart, 4), 16), 0), // Sexta às 16:00
-        end: setMinutes(setHours(addDays(weekStart, 4), 17), 0),
+        start: _setMinutes(_setHours(addDays(weekStart, 4), 16), 0), // Sexta às 16:00
+        end: _setMinutes(_setHours(addDays(weekStart, 4), 17), 0),
         agentId: 'agent-1',
         leadId: 'lead-3',
         propertyId: 'prop-3'
@@ -212,8 +235,8 @@ export const visits: Visit[] = [
      {
         id: 'visit-4',
         title: 'Alinhamento com Ricardo',
-        start: setMinutes(setHours(addDays(weekStart, 0), 9), 0), // Segunda às 09:00
-        end: setMinutes(setHours(addDays(weekStart, 0), 9), 30),
+        start: _setMinutes(_setHours(addDays(weekStart, 0), 9), 0), // Segunda às 09:00
+        end: _setMinutes(_setHours(addDays(weekStart, 0), 9), 30),
         agentId: 'agent-3',
         leadId: 'lead-4',
         propertyId: 'prop-4'
